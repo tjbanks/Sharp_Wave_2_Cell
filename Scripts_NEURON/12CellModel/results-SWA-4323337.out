@@ -1,0 +1,55 @@
+Starting Sharp Wave Model at Thu Feb  8 18:39:47 CST 2018
+Currently Loaded Modulefiles:
+  1) intel/intel-2016-update2   3) matlab/matlab-R2017a
+  2) nrn/nrn-mpi-7.4            4) openmpi/openmpi-2.0.0
+Main file starting at Thu Feb  8 18:39:47 CST 2018
+NEURON -- Release 7.4 (1370:16a7055d4a86) 2015-11-09
+Duke, Yale, and the BlueBrain Project -- Copyright 1984-2015
+See http://www.neuron.yale.edu/neuron/credits
+
+Additional mechanisms from files
+ bg2pyr.mod cadyn.mod cal2.mod ca.mod capool.mod ch_CavL.mod ch_CavN.mod ch_KCaS.mod ch_Kdrfast.mod ch_KvA.mod ch_KvCaB.mod ch_leak.mod ch_Nav.mod Chn_Pyr.mod currentclamp.mod h.mod im.mod ITN_Pyr.mod kaprox.mod kca.mod kdrca1.mod kdrinter.mod km.mod kv.mod leakinter.mod leak.mod MyExp2Sid.mod mynetstim.mod na12.mod na16.mod na3.mod nainter.mod nap.mod nat.mod Pyr_ITN.mod sahp.mod
+Cell 9 connected to 1
+Cell 10 connected to 1
+Cell 10 connected to 2
+Cell 1 connected to 9
+Cell 2 connected to 9
+Cell 1 connected to 10
+Cell 2 connected to 10
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	Matrix[2] 
+	Matrix[3] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[2] 
+	Matrix[3] 
+	1 
+	1 
+	0 
+	0 
+	1 
+	1 
+	0 
+	0 
+srun: error: Unable to create job step: Memory required by task is not available
+Program complete... Thu Feb  8 18:39:53 CST 2018

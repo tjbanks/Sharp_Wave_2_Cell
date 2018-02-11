@@ -1,0 +1,48 @@
+{load_file("nrngui.hoc")}					//GUI library is loaded and neuron main menu toolbar appears
+//{load_file("interneuron_template.hoc")}		//loads file LAcells_template.hoc
+{load_file("LAcells_template.hoc")}
+{load_file("graphics_lib.hoc")}
+{load_file("class_axoaxoniccell.hoc")}
+
+v_init = -70								//initial value of voltage is set to -70mV
+tstop = 100
+
+objref Pyr, Chn								//declares that cell is a variable and will be used to refer Cell_B
+Pyr = new Cell_C()							//assigns Cell_C object class to Cell
+Chn = new axoaxoniccell()
+
+objref Chn2PyrSyn, Chn2PyrNC, Pyr2ChnSyn, Pyr2ChnNC
+
+Pyr.AIS[9] Chn2PyrSyn = new MyExp2Sid(0.9)
+access Chn.soma
+Chn2PyrNC = new NetCon(&v(0.5), Chn2PyrSyn)
+Chn2PyrNC.weight = 0.5 //With MyExp2Sid, NC weight of 1 is a peak conductance of 1.
+
+Chn.soma Pyr2ChnSyn = new Pyr_ITN(0.5)
+access Pyr.axon
+Pyr2ChnNC = new NetCon(&v(1), Pyr2ChnSyn)
+Pyr2ChnNC.weight = 1
+Pyr2ChnSyn.initW = 50
+
+
+objref stim									//declares a variable stim
+Chn.soma stim = new IClamp(0.5) 			//creates current clamp at the middle of the soma and assigns to stim
+stim.del = 20 // in ms						//delay of the stim 
+stim.dur = 5 // in ms						//duration of the stim
+stim.amp = 1 // in nA 				
+
+///// simulation control ////
+secondorder = 2								//currents are updated with a call to second_order_current
+steps_per_ms= 10							//no. of steps per ms
+
+run()
+
+Plot1V("Pyr.AIS[9]","Pyr.axon")
+Plot1V("Chn.soma", "Chn.soma")
+PlotSynCurrent("Chn2PyrSyn.g","Chn2PyrSyn.i")
+PlotSynCurrent("Pyr2ChnSyn.g_ampa","Pyr2ChnSyn.iampa")
+
+run()
+
+
+

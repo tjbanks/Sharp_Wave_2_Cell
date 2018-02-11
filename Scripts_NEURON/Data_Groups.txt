@@ -1,0 +1,6 @@
+	0	Pyramidal	1
+	1	PV Basket	0
+	2	Chandelier	1
+	3	Calretinin	0
+	4	CCK	0
+	5	Somatostatin	0
