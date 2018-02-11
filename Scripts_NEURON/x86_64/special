@@ -1,13 +1,13 @@
 #!/bin/sh
 if test "x${NRNHOME}" = "x" ; then
-	NRNHOME="/cluster/software/nrn-mpi/nrn-mpi-7.4"
+	NRNHOME="/home/tbg28/neuron_install/nrn"
 fi
 if test "x${NRNBIN}" = "x" ; then
-	NRNBIN="/cluster/software/nrn-mpi/nrn-mpi-7.4/bin/"
+	NRNBIN="/home/tbg28/neuron_install/nrn/x86_64/bin/"
 fi
 if test "" = "yes" ; then
 	NRNIV="${NRNBIN}nrniv.app/Contents/MacOS/nrniv"
 else
 	NRNIV="${NRNBIN}nrniv"
 fi
-"${NRNIV}" -dll "/home/latimerb/data/Sharp_Wave_BLA/Scripts_NEURON/x86_64/.libs/libnrnmech.so" "$@"
+"${NRNIV}" -dll "/home/tbg28/git_staging/Sharp_Wave_2_Cell/Scripts_NEURON/x86_64/.libs/libnrnmech.so" "$@"
