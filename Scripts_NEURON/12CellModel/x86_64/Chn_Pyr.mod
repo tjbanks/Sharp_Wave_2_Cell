@@ -1,1 +1,0 @@
-../Chn_Pyr.mod

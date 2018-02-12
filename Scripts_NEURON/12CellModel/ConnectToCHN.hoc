@@ -1,4 +1,4 @@
-NCELL = 12
+NCELL = 2
 
 obfunc LoadMatrix() { local nrow,ncol localobj mat,datafile
 

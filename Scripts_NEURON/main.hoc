@@ -45,8 +45,8 @@ objref axonCurrent, vclamp
 for (i = pc.id; i < N_CELL; i+= pc.nhost){
 	if (i < N_Pyramidal){
 		cell = new Cell_C()
-	}else if (i >= N_Pyramidal && i < N_Pyramidal+N_PVBasket){
-		cell = new InterneuronCell()
+	//}else if (i >= N_Pyramidal && i < N_Pyramidal+N_PVBasket){
+	//	cell = new InterneuronCell()
 	}else if (i >= N_Pyramidal+N_PVBasket &&  i < N_Pyramidal+N_PVBasket+N_Chandelier){
 		cell = new axoaxoniccell()
 	// Place current clamp on first chandelier cell
@@ -55,7 +55,7 @@ for (i = pc.id; i < N_CELL; i+= pc.nhost){
 			axonCurrent=new IClamp(0.1)
 			axonCurrent.dur = 22
 			axonCurrent.del = 200
-			axonCurrent.amp = 1
+			axonCurrent.amp = 2
 		}	
 		// Place voltage clamp on second chandelier cell
 		if (i == N_Pyramidal+N_PVBasket+2){
