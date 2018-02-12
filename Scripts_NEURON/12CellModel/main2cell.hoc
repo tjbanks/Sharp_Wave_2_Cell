@@ -25,10 +25,10 @@ NCELL = 2
 cellslist = new List()
 
 for (i = pc.id; i < NCELL; i+= pc.nhost){
-	if (i < 2){
+	if (i < 1){
 		cell = new Cell_C()
 	}else{
-		cell = new InterneuronCell()	
+		cell = new axoaxoniccell()	
 	}
 	cellslist.append(cell)
 	pc.set_gid2node(i, pc.id)
@@ -77,7 +77,7 @@ objref somaCurrent
 cellslist.object(0) somaCurrent = new IClamp(0.9)
 somaCurrent.dur = 100
 somaCurrent.del = 2
-somaCurrent.amp = 1.01
+somaCurrent.amp = 1
 
 
 
@@ -126,7 +126,7 @@ Volrec1 = new Vector()
 //Currec0.record(&somaVclamp1.i)
 
 Volrec0.record(&cellslist.object(0).axon.v(0.5))
-Volrec1.record(&cellslist.object(1).axon.v(0.5))
+Volrec1.record(&cellslist.object(1).soma.v(0.5))
 
 
 objref tempmatrix

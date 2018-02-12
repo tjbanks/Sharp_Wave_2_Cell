@@ -1,6 +1,5 @@
 /* Created by Language version: 6.2.0 */
 /* NOT VECTORIZED */
-#define NRN_VECTORIZED 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,18 +21,10 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define nrn_init _nrn_init__Pyr_ITN
-#define _nrn_initial _nrn_initial__Pyr_ITN
-#define nrn_cur _nrn_cur__Pyr_ITN
-#define _nrn_current _nrn_current__Pyr_ITN
-#define nrn_jacob _nrn_jacob__Pyr_ITN
-#define nrn_state _nrn_state__Pyr_ITN
-#define _net_receive _net_receive__Pyr_ITN 
-#define release release__Pyr_ITN 
- 
 #define _threadargscomma_ /**/
-#define _threadargsprotocomma_ /**/
 #define _threadargs_ /**/
+ 
+#define _threadargsprotocomma_ /**/
 #define _threadargsproto_ /**/
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
@@ -256,7 +247,6 @@ static void _ode_spec(_NrnThread*, _Memb_list*, int);
 static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[3]._i
- static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
  "6.2.0",
@@ -391,7 +381,7 @@ static void nrn_alloc(Prop* _prop) {
  static void _net_receive(Point_process*, double*, double);
  static void _update_ion_pointer(Datum*);
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
@@ -409,16 +399,12 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
   hoc_register_prop_size(_mechtype, 69, 4);
-  hoc_register_dparam_semantics(_mechtype, 0, "area");
-  hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
-  hoc_register_dparam_semantics(_mechtype, 2, "ca_ion");
-  hoc_register_dparam_semantics(_mechtype, 3, "cvodeieq");
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 Pyr_ITN C:/Users/Tyler/Desktop/git_stage/Sharp_Wave_BLA/Scripts_NEURON/12CellModel/Pyr_ITN.mod\n");
+ 	ivoc_help("help ?1 Pyr_ITN C:/Users/a/Desktop/git_stage/Sharp_Wave_2_Cell/Scripts_NEURON/12CellModel/Pyr_ITN.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -521,8 +507,8 @@ static int _ode_spec1(_threadargsproto_);
      on_ampa = 0.0 ;
      }
    }
- Dr_nmda = Dr_nmda  / (1. - dt*( ( AlphaTmax_nmda * on_nmda )*( ( ( - 1.0 ) ) ) - ( Beta_nmda )*( 1.0 ) )) ;
- Dr_ampa = Dr_ampa  / (1. - dt*( ( AlphaTmax_ampa * on_ampa )*( ( ( - 1.0 ) ) ) - ( Beta_ampa )*( 1.0 ) )) ;
+ Dr_nmda = Dr_nmda  / (1. - dt*( (AlphaTmax_nmda * on_nmda)*(( ( - 1.0 ) )) - (Beta_nmda)*(1.0) )) ;
+ Dr_ampa = Dr_ampa  / (1. - dt*( (AlphaTmax_ampa * on_ampa)*(( ( - 1.0 ) )) - (Beta_ampa)*(1.0) )) ;
  dW_ampa = eta ( _threadargscomma_ capoolcon ) * ( lambda1 * omega ( _threadargscomma_ capoolcon , threshold1 , threshold2 ) - lambda2 * W ) * dt ;
  if ( fabs ( dW_ampa ) > maxChange ) {
    if ( dW_ampa < 0.0 ) {
@@ -583,8 +569,8 @@ static int _ode_spec1(_threadargsproto_);
        on_ampa = 0.0 ;
        }
      }
-    r_nmda = r_nmda + (1. - exp(dt*(( AlphaTmax_nmda * on_nmda )*( ( ( - 1.0 ) ) ) - ( Beta_nmda )*( 1.0 ))))*(- ( ( ( AlphaTmax_nmda )*( on_nmda ) )*( ( 1.0 ) ) ) / ( ( ( AlphaTmax_nmda )*( on_nmda ) )*( ( ( - 1.0 ) ) ) - ( Beta_nmda )*( 1.0 ) ) - r_nmda) ;
-    r_ampa = r_ampa + (1. - exp(dt*(( AlphaTmax_ampa * on_ampa )*( ( ( - 1.0 ) ) ) - ( Beta_ampa )*( 1.0 ))))*(- ( ( ( AlphaTmax_ampa )*( on_ampa ) )*( ( 1.0 ) ) ) / ( ( ( AlphaTmax_ampa )*( on_ampa ) )*( ( ( - 1.0 ) ) ) - ( Beta_ampa )*( 1.0 ) ) - r_ampa) ;
+    r_nmda = r_nmda + (1. - exp(dt*((AlphaTmax_nmda * on_nmda)*(( ( - 1.0 ) )) - (Beta_nmda)*(1.0))))*(- ( ((AlphaTmax_nmda)*(on_nmda))*(( 1.0 )) ) / ( ((AlphaTmax_nmda)*(on_nmda))*(( ( - 1.0) )) - (Beta_nmda)*(1.0) ) - r_nmda) ;
+    r_ampa = r_ampa + (1. - exp(dt*((AlphaTmax_ampa * on_ampa)*(( ( - 1.0 ) )) - (Beta_ampa)*(1.0))))*(- ( ((AlphaTmax_ampa)*(on_ampa))*(( 1.0 )) ) / ( ((AlphaTmax_ampa)*(on_ampa))*(( ( - 1.0) )) - (Beta_ampa)*(1.0) ) - r_ampa) ;
    dW_ampa = eta ( _threadargscomma_ capoolcon ) * ( lambda1 * omega ( _threadargscomma_ capoolcon , threshold1 , threshold2 ) - lambda2 * W ) * dt ;
    if ( fabs ( dW_ampa ) > maxChange ) {
      if ( dW_ampa < 0.0 ) {
@@ -619,7 +605,7 @@ static int _ode_spec1(_threadargsproto_);
    g_ampa = gbar_ampa * r_ampa * facfactor ;
    iampa = W * g_ampa * ( v - Erev_ampa ) ;
    ICa = P0 * g_nmda * ( v - eca ) * sfunc ( _threadargscomma_ v ) ;
-    capoolcon = capoolcon + (1. - exp(dt*(( ( ( - 1.0 ) ) ) / tauCa)))*(- ( ( ( - fCa )*( Afactor ) )*( ICa ) + ( ( Cainf ) ) / tauCa ) / ( ( ( ( - 1.0 ) ) ) / tauCa ) - capoolcon) ;
+    capoolcon = capoolcon + (1. - exp(dt*(( ( ( - 1.0 ) ) ) / tauCa)))*(- ( ((- fCa)*(Afactor))*(ICa) + ( ( Cainf ) ) / tauCa ) / ( ( ( ( - 1.0) ) ) / tauCa ) - capoolcon) ;
    }
   return 0;
 }
@@ -742,10 +728,6 @@ static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum
 	}
  }
  
-static void _ode_matsol_instance1(_threadargsproto_) {
- _ode_matsol1 ();
- }
- 
 static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
    Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
@@ -756,7 +738,7 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     _nd = _ml->_nodelist[_iml];
     v = NODEV(_nd);
   eca = _ion_eca;
- _ode_matsol_instance1(_threadargs_);
+ _ode_matsol1 ();
  }}
  extern void nrn_update_ion_pointer(Symbol*, Datum*, int, int);
  static void _update_ion_pointer(Datum* _ppvar) {
@@ -883,7 +865,8 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }}
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
-Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
+ double _break, _save;
+Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
@@ -900,11 +883,17 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _nd = _ml->_nodelist[_iml];
     _v = NODEV(_nd);
   }
+ _break = t + .5*dt; _save = t;
  v=_v;
 {
   eca = _ion_eca;
- { error =  release();
+ { {
+ for (; t < _break; t += dt) {
+ error =  release();
  if(error){fprintf(stderr,"at line 141 in file Pyr_ITN.mod:\n	SOLVE release METHOD cnexp\n"); nrn_complain(_p); abort_run(error);}
+ 
+}}
+ t = _save;
  }}}
 
 }

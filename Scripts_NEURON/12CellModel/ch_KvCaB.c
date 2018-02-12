@@ -1,6 +1,5 @@
 /* Created by Language version: 6.2.0 */
 /* NOT VECTORIZED */
-#define NRN_VECTORIZED 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,19 +21,10 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define nrn_init _nrn_init__ch_KvCaB
-#define _nrn_initial _nrn_initial__ch_KvCaB
-#define nrn_cur _nrn_cur__ch_KvCaB
-#define _nrn_current _nrn_current__ch_KvCaB
-#define nrn_jacob _nrn_jacob__ch_KvCaB
-#define nrn_state _nrn_state__ch_KvCaB
-#define _net_receive _net_receive__ch_KvCaB 
-#define rate rate__ch_KvCaB 
-#define state state__ch_KvCaB 
- 
 #define _threadargscomma_ /**/
-#define _threadargsprotocomma_ /**/
 #define _threadargs_ /**/
+ 
+#define _threadargsprotocomma_ /**/
 #define _threadargsproto_ /**/
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
@@ -179,7 +169,6 @@ static void _ode_spec(_NrnThread*, _Memb_list*, int);
 static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[4]._i
- static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
  "6.2.0",
@@ -227,7 +216,7 @@ static void nrn_alloc(Prop* _prop) {
 };
  static void _update_ion_pointer(Datum*);
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
@@ -244,15 +233,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
   hoc_register_prop_size(_mechtype, 9, 5);
-  hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
-  hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
-  hoc_register_dparam_semantics(_mechtype, 2, "k_ion");
-  hoc_register_dparam_semantics(_mechtype, 3, "ca_ion");
-  hoc_register_dparam_semantics(_mechtype, 4, "cvodeieq");
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_KvCaB C:/Users/Tyler/Desktop/git_stage/Sharp_Wave_BLA/Scripts_NEURON/12CellModel/ch_KvCaB.mod\n");
+ 	ivoc_help("help ?1 ch_KvCaB C:/Users/a/Desktop/git_stage/Sharp_Wave_2_Cell/Scripts_NEURON/12CellModel/ch_KvCaB.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -296,7 +280,7 @@ static int _ode_spec1(_threadargsproto_);
  static int state () {_reset=0;
  {
    rate ( _threadargscomma_ v , cai ) ;
-    o = o + (1. - exp(dt*(( ( ( - 1.0 ) ) ) / otau)))*(- ( ( ( oinf ) ) / otau ) / ( ( ( ( - 1.0 ) ) ) / otau ) - o) ;
+    o = o + (1. - exp(dt*(( ( ( - 1.0 ) ) ) / otau)))*(- ( ( ( oinf ) ) / otau ) / ( ( ( ( - 1.0) ) ) / otau ) - o) ;
    }
   return 0;
 }
@@ -379,10 +363,6 @@ static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum
 	}
  }
  
-static void _ode_matsol_instance1(_threadargsproto_) {
- _ode_matsol1 ();
- }
- 
 static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
    Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
@@ -394,7 +374,7 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     v = NODEV(_nd);
   ek = _ion_ek;
   cai = _ion_cai;
- _ode_matsol_instance1(_threadargs_);
+ _ode_matsol1 ();
  }}
  extern void nrn_update_ion_pointer(Symbol*, Datum*, int, int);
  static void _update_ion_pointer(Datum* _ppvar) {
@@ -511,7 +491,8 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }}
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
-Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
+ double _break, _save;
+Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
@@ -528,12 +509,18 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _nd = _ml->_nodelist[_iml];
     _v = NODEV(_nd);
   }
+ _break = t + .5*dt; _save = t;
  v=_v;
 {
   ek = _ion_ek;
   cai = _ion_cai;
- { error =  state();
+ { {
+ for (; t < _break; t += dt) {
+ error =  state();
  if(error){fprintf(stderr,"at line 95 in file ch_KvCaB.mod:\n	SOLVE state METHOD cnexp\n"); nrn_complain(_p); abort_run(error);}
+ 
+}}
+ t = _save;
  } }}
 
 }

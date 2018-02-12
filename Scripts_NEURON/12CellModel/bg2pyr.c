@@ -1,6 +1,5 @@
 /* Created by Language version: 6.2.0 */
-/* VECTORIZED */
-#define NRN_VECTORIZED 1
+/* NOT VECTORIZED */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,28 +21,20 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define nrn_init _nrn_init__bg2pyr
-#define _nrn_initial _nrn_initial__bg2pyr
-#define nrn_cur _nrn_cur__bg2pyr
-#define _nrn_current _nrn_current__bg2pyr
-#define nrn_jacob _nrn_jacob__bg2pyr
-#define nrn_state _nrn_state__bg2pyr
-#define _net_receive _net_receive__bg2pyr 
-#define states states__bg2pyr 
+#define _threadargscomma_ /**/
+#define _threadargs_ /**/
  
-#define _threadargscomma_ _p, _ppvar, _thread, _nt,
-#define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
-#define _threadargs_ _p, _ppvar, _thread, _nt
-#define _threadargsproto_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt
+#define _threadargsprotocomma_ /**/
+#define _threadargsproto_ /**/
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
 	/*SUPPRESS 763*/
 	/*SUPPRESS 765*/
 	 extern double *getarg();
- /* Thread safe. No static _p or _ppvar. */
+ static double *_p; static Datum *_ppvar;
  
-#define t _nt->_t
-#define dt _nt->_dt
+#define t nrn_threads->_t
+#define dt nrn_threads->_dt
 #define initW _p[0]
 #define taun1 _p[1]
 #define taun2 _p[2]
@@ -72,9 +63,8 @@ extern double hoc_Exp(double);
 #define DBn _p[25]
 #define DAa _p[26]
 #define DBa _p[27]
-#define v _p[28]
-#define _g _p[29]
-#define _tsav _p[30]
+#define _g _p[28]
+#define _tsav _p[29]
 #define _nd_area  *_ppvar[0]._pval
  
 #if MAC
@@ -90,8 +80,6 @@ extern double hoc_Exp(double);
 extern "C" {
 #endif
  static int hoc_nrnpointerindex =  -1;
- static Datum* _extcall_thread;
- static Prop* _extcall_prop;
  /* external NEURON variables */
  /* declaration of user functions */
  static double _hoc_sfunc();
@@ -119,7 +107,7 @@ extern Memb_func* memb_func;
 }
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
- _extcall_prop = _prop;
+ _p = _prop->param; _ppvar = _prop->dparam;
  }
  static void _hoc_setdata(void* _vptr) { Prop* _prop;
  _prop = ((Point_process*)_vptr)->_prop;
@@ -137,7 +125,7 @@ extern Memb_func* memb_func;
  0, 0
 };
 #define sfunc sfunc_bg2pyr
- extern double sfunc( _threadargsprotocomma_ double );
+ extern double sfunc( double );
  /* declare global and static user variables */
  /* some parameters have upper and lower limits */
  static HocParmLimits _hoc_parm_limits[] = {
@@ -161,6 +149,7 @@ extern Memb_func* memb_func;
  static double Ba0 = 0;
  static double Bn0 = 0;
  static double delta_t = 0.01;
+ static double v = 0;
  /* connect global user variables to hoc */
  static DoubScal hoc_scdoub[] = {
  0,0
@@ -184,7 +173,6 @@ static void _ode_spec(_NrnThread*, _Memb_list*, int);
 static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[2]._i
- static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
  "6.2.0",
@@ -227,7 +215,7 @@ static void nrn_alloc(Prop* _prop) {
 	_p = nrn_point_prop_->param;
 	_ppvar = nrn_point_prop_->dparam;
  }else{
- 	_p = nrn_prop_data_alloc(_mechtype, 31, _prop);
+ 	_p = nrn_prop_data_alloc(_mechtype, 30, _prop);
  	/*initialize range parameters*/
  	initW = 6.3;
  	taun1 = 5;
@@ -240,7 +228,7 @@ static void nrn_alloc(Prop* _prop) {
  	eampa = 0;
   }
  	_prop->param = _p;
- 	_prop->param_size = 31;
+ 	_prop->param_size = 30;
   if (!nrn_point_prop_) {
  	_ppvar = nrn_prop_datum_alloc(_mechtype, 3, _prop);
   }
@@ -256,30 +244,27 @@ static void nrn_alloc(Prop* _prop) {
 };
  static void _net_receive(Point_process*, double*, double);
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
 
  void _bg2pyr_reg() {
-	int _vectorized = 1;
+	int _vectorized = 0;
   _initlists();
  	_pointtype = point_register_mech(_mechanism,
 	 nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init,
-	 hoc_nrnpointerindex, 1,
+	 hoc_nrnpointerindex, 0,
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
-  hoc_register_prop_size(_mechtype, 31, 3);
-  hoc_register_dparam_semantics(_mechtype, 0, "area");
-  hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
-  hoc_register_dparam_semantics(_mechtype, 2, "cvodeieq");
+  hoc_register_prop_size(_mechtype, 30, 3);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 bg2pyr C:/Users/Tyler/Desktop/git_stage/Sharp_Wave_BLA/Scripts_NEURON/12CellModel/bg2pyr.mod\n");
+ 	ivoc_help("help ?1 bg2pyr C:/Users/a/Desktop/git_stage/Sharp_Wave_2_Cell/Scripts_NEURON/12CellModel/bg2pyr.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -293,11 +278,13 @@ static void _modl_cleanup(){ _match_recurse=1;}
  
 static int _ode_spec1(_threadargsproto_);
 /*static int _ode_matsol1(_threadargsproto_);*/
+ extern int state_discon_flag_;
  static int _slist1[4], _dlist1[4];
  static int states(_threadargsproto_);
  
 /*CVODE*/
- static int _ode_spec1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {int _reset = 0; {
+ static int _ode_spec1 () {_reset=0;
+ {
    DAn = - An / taun1 ;
    DBn = - Bn / taun2 ;
    DAa = - Aa / taua1 ;
@@ -305,7 +292,7 @@ static int _ode_spec1(_threadargsproto_);
    }
  return _reset;
 }
- static int _ode_matsol1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
+ static int _ode_matsol1 () {
  DAn = DAn  / (1. - dt*( ( - 1.0 ) / taun1 )) ;
  DBn = DBn  / (1. - dt*( ( - 1.0 ) / taun2 )) ;
  DAa = DAa  / (1. - dt*( ( - 1.0 ) / taua1 )) ;
@@ -313,7 +300,8 @@ static int _ode_spec1(_threadargsproto_);
  return 0;
 }
  /*END CVODE*/
- static int states (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
+ static int states () {_reset=0;
+ {
     An = An + (1. - exp(dt*(( - 1.0 ) / taun1)))*(- ( 0.0 ) / ( ( - 1.0 ) / taun1 ) - An) ;
     Bn = Bn + (1. - exp(dt*(( - 1.0 ) / taun2)))*(- ( 0.0 ) / ( ( - 1.0 ) / taun2 ) - Bn) ;
     Aa = Aa + (1. - exp(dt*(( - 1.0 ) / taua1)))*(- ( 0.0 ) / ( ( - 1.0 ) / taua1 ) - Aa) ;
@@ -323,51 +311,18 @@ static int _ode_spec1(_threadargsproto_);
 }
  
 static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _args; double _lflag; 
-{  double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _thread = (Datum*)0; _nt = (_NrnThread*)_pnt->_vnt;   _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
+{    _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
   if (_tsav > t){ extern char* hoc_object_name(); hoc_execerror(hoc_object_name(_pnt->ob), ":Event arrived out of order. Must call ParallelContext.set_maxstep AFTER assigning minimum NetCon.delay");}
  _tsav = t; {
    double _lx ;
  _lx = _args[0] ;
-       if (nrn_netrec_state_adjust && !cvode_active_){
-    /* discon state adjustment for cnexp case (rate uses no local variable) */
-    double __state = An;
-    double __primary = (An + _lx ) - __state;
-     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / taun1 ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / taun1 ) - __primary );
-    An += __primary;
-  } else {
- An = An + _lx  ;
-     }
-     if (nrn_netrec_state_adjust && !cvode_active_){
-    /* discon state adjustment for cnexp case (rate uses no local variable) */
-    double __state = Bn;
-    double __primary = (Bn + _lx ) - __state;
-     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / taun2 ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / taun2 ) - __primary );
-    Bn += __primary;
-  } else {
- Bn = Bn + _lx  ;
-     }
-     if (nrn_netrec_state_adjust && !cvode_active_){
-    /* discon state adjustment for cnexp case (rate uses no local variable) */
-    double __state = Aa;
-    double __primary = (Aa + _lx ) - __state;
-     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / taua1 ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / taua1 ) - __primary );
-    Aa += __primary;
-  } else {
- Aa = Aa + _lx  ;
-     }
-     if (nrn_netrec_state_adjust && !cvode_active_){
-    /* discon state adjustment for cnexp case (rate uses no local variable) */
-    double __state = Ba;
-    double __primary = (Ba + _lx ) - __state;
-     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / taua2 ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / taua2 ) - __primary );
-    Ba += __primary;
-  } else {
- Ba = Ba + _lx  ;
-     }
- } }
+   state_discontinuity ( _cvode_ieq + 0, & An , An + _lx ) ;
+   state_discontinuity ( _cvode_ieq + 1, & Bn , Bn + _lx ) ;
+   state_discontinuity ( _cvode_ieq + 2, & Aa , Aa + _lx ) ;
+   state_discontinuity ( _cvode_ieq + 3, & Ba , Ba + _lx ) ;
+   } }
  
-double sfunc ( _threadargsprotocomma_ double _lv ) {
+double sfunc (  double _lv ) {
    double _lsfunc;
   _lsfunc = 1.0 / ( 1.0 + 0.33 * exp ( - 0.06 * _lv ) ) ;
     
@@ -376,19 +331,15 @@ return _lsfunc;
  
 static double _hoc_sfunc(void* _vptr) {
  double _r;
-   double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _p = ((Point_process*)_vptr)->_prop->param;
-  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
-  _thread = _extcall_thread;
-  _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
- _r =  sfunc ( _p, _ppvar, _thread, _nt, *getarg(1) );
+    _hoc_setdata(_vptr);
+ _r =  sfunc (  *getarg(1) );
  return(_r);
 }
  
 static int _ode_count(int _type){ return 4;}
  
 static void _ode_spec(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-   double* _p; Datum* _ppvar; Datum* _thread;
+   Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
   _cntml = _ml->_nodecount;
   _thread = _ml->_thread;
@@ -396,11 +347,10 @@ static void _ode_spec(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
     _nd = _ml->_nodelist[_iml];
     v = NODEV(_nd);
-     _ode_spec1 (_p, _ppvar, _thread, _nt);
+     _ode_spec1 ();
  }}
  
 static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum* _ppd, double* _atol, int _type) { 
-	double* _p; Datum* _ppvar;
  	int _i; _p = _pp; _ppvar = _ppd;
 	_cvode_ieq = _ieq;
 	for (_i=0; _i < 4; ++_i) {
@@ -409,12 +359,8 @@ static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum
 	}
  }
  
-static void _ode_matsol_instance1(_threadargsproto_) {
- _ode_matsol1 (_p, _ppvar, _thread, _nt);
- }
- 
 static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-   double* _p; Datum* _ppvar; Datum* _thread;
+   Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
   _cntml = _ml->_nodecount;
   _thread = _ml->_thread;
@@ -422,11 +368,14 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
     _nd = _ml->_nodelist[_iml];
     v = NODEV(_nd);
- _ode_matsol_instance1(_threadargs_);
+ _ode_matsol1 ();
  }}
 
-static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
-  int _i; double _save;{
+static void initmodel() {
+  int _i; double _save;_ninits++;
+ _save = t;
+ t = 0.0;
+{
   Aa = Aa0;
   An = An0;
   Ba = Ba0;
@@ -441,18 +390,17 @@ static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt
    factora = taua1 * taua2 / ( taua2 - taua1 ) ;
    normconsta = - 1.0 / ( factora * ( 1.0 / exp ( log ( taua2 / taua1 ) / ( taua1 * ( 1.0 / taua1 - 1.0 / taua2 ) ) ) - 1.0 / exp ( log ( taua2 / taua1 ) / ( taua2 * ( 1.0 / taua1 - 1.0 / taua2 ) ) ) ) ) ;
    }
- 
+  _sav_indep = t; t = _save;
+
 }
 }
 
 static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type){
-double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
-_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
  _tsav = -1e20;
@@ -466,11 +414,10 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _v = NODEV(_nd);
   }
  v = _v;
- initmodel(_p, _ppvar, _thread, _nt);
-}
-}
+ initmodel();
+}}
 
-static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
+static double _nrn_current(double _v){double _current=0.;v=_v;{ {
    gnmda = normconstn * factorn * ( Bn - An ) ;
    gnmdas = gnmda ;
    if ( gnmdas > 1.0 ) {
@@ -490,14 +437,12 @@ static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread
 } return _current;
 }
 
-static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-double* _p; Datum* _ppvar; Datum* _thread;
+static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; int* _ni; double _rhs, _v; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
-_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
 #if CACHEVEC
@@ -509,8 +454,8 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _nd = _ml->_nodelist[_iml];
     _v = NODEV(_nd);
   }
- _g = _nrn_current(_p, _ppvar, _thread, _nt, _v + .001);
- 	{ _rhs = _nrn_current(_p, _ppvar, _thread, _nt, _v);
+ _g = _nrn_current(_v + .001);
+ 	{ state_discon_flag_ = 1; _rhs = _nrn_current(_v); state_discon_flag_ = 0;
  	}
  _g = (_g - _rhs)/.001;
  _g *=  1.e2/(_nd_area);
@@ -524,18 +469,14 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 	NODERHS(_nd) -= _rhs;
   }
  
-}
- 
-}
+}}
 
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-double* _p; Datum* _ppvar; Datum* _thread;
+static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
-_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml];
 #if CACHEVEC
@@ -548,18 +489,15 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 	NODED(_nd) += _g;
   }
  
-}
- 
-}
+}}
 
-static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-double* _p; Datum* _ppvar; Datum* _thread;
-Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
+static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
+ double _break, _save;
+Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
-_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
  _nd = _ml->_nodelist[_iml];
@@ -572,17 +510,23 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _nd = _ml->_nodelist[_iml];
     _v = NODEV(_nd);
   }
+ _break = t + .5*dt; _save = t;
  v=_v;
 {
- {   states(_p, _ppvar, _thread, _nt);
-  }}}
+ { {
+ for (; t < _break; t += dt) {
+ error =  states();
+ if(error){fprintf(stderr,"at line 85 in file bg2pyr.mod:\n	SOLVE states METHOD cnexp\n"); nrn_complain(_p); abort_run(error);}
+ 
+}}
+ t = _save;
+ }}}
 
 }
 
 static void terminal(){}
 
-static void _initlists(){
- double _x; double* _p = &_x;
+static void _initlists() {
  int _i; static int _first = 1;
   if (!_first) return;
  _slist1[0] = &(An) - _p;  _dlist1[0] = &(DAn) - _p;
@@ -591,7 +535,3 @@ static void _initlists(){
  _slist1[3] = &(Ba) - _p;  _dlist1[3] = &(DBa) - _p;
 _first = 0;
 }
-
-#if defined(__cplusplus)
-} /* extern "C" */
-#endif

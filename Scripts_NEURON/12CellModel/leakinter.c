@@ -1,6 +1,5 @@
 /* Created by Language version: 6.2.0 */
 /* VECTORIZED */
-#define NRN_VECTORIZED 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,17 +21,10 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define nrn_init _nrn_init__leakinter
-#define _nrn_initial _nrn_initial__leakinter
-#define nrn_cur _nrn_cur__leakinter
-#define _nrn_current _nrn_current__leakinter
-#define nrn_jacob _nrn_jacob__leakinter
-#define nrn_state _nrn_state__leakinter
-#define _net_receive _net_receive__leakinter 
- 
 #define _threadargscomma_ _p, _ppvar, _thread, _nt,
-#define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
 #define _threadargs_ _p, _ppvar, _thread, _nt
+ 
+#define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
 #define _threadargsproto_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
@@ -140,7 +132,7 @@ static void nrn_alloc(Prop* _prop) {
 }
  static void _initlists();
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
@@ -153,7 +145,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_setdata_reg(_mechtype, _setdata);
   hoc_register_prop_size(_mechtype, 5, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 leakinter C:/Users/Tyler/Desktop/git_stage/Sharp_Wave_BLA/Scripts_NEURON/12CellModel/leakinter.mod\n");
+ 	ivoc_help("help ?1 leakinter C:/Users/a/Desktop/git_stage/Sharp_Wave_2_Cell/Scripts_NEURON/12CellModel/leakinter.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -192,8 +184,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   }
  v = _v;
  initmodel(_p, _ppvar, _thread, _nt);
-}
-}
+}}
 
 static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
    il = glbar_inter * ( v - el ) ;
@@ -235,9 +226,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 	NODERHS(_nd) -= _rhs;
   }
  
-}
- 
-}
+}}
 
 static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type) {
 double* _p; Datum* _ppvar; Datum* _thread;
@@ -259,9 +248,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 	NODED(_nd) += _g;
   }
  
-}
- 
-}
+}}
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
 

@@ -1,6 +1,5 @@
 /* Created by Language version: 6.2.0 */
 /* NOT VECTORIZED */
-#define NRN_VECTORIZED 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,17 +21,10 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define nrn_init _nrn_init__ch_leak
-#define _nrn_initial _nrn_initial__ch_leak
-#define nrn_cur _nrn_cur__ch_leak
-#define _nrn_current _nrn_current__ch_leak
-#define nrn_jacob _nrn_jacob__ch_leak
-#define nrn_state _nrn_state__ch_leak
-#define _net_receive _net_receive__ch_leak 
- 
 #define _threadargscomma_ /**/
-#define _threadargsprotocomma_ /**/
 #define _threadargs_ /**/
+ 
+#define _threadargsprotocomma_ /**/
 #define _threadargsproto_ /**/
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
@@ -144,7 +136,7 @@ static void nrn_alloc(Prop* _prop) {
 }
  static void _initlists();
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
@@ -157,7 +149,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_setdata_reg(_mechtype, _setdata);
   hoc_register_prop_size(_mechtype, 6, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_leak C:/Users/Tyler/Desktop/git_stage/Sharp_Wave_BLA/Scripts_NEURON/12CellModel/ch_leak.mod\n");
+ 	ivoc_help("help ?1 ch_leak C:/Users/a/Desktop/git_stage/Sharp_Wave_2_Cell/Scripts_NEURON/12CellModel/ch_leak.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
