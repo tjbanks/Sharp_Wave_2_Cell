@@ -37,13 +37,13 @@ proc ChnToPyr() { local i, j, cellgid, inputid, sourceid, targetid, synid localo
 	
 	{pc.barrier()}
 
-	for j = 0, 3 {
+	for j = 0, 0 {
 
 		cellgid = j
 
 		if(!pc.gid_exists(cellgid)) { continue }
 
-		for i = 8, NCELL-1 {
+		for i = 1, 1 {
 		
 			inputid = i
 			

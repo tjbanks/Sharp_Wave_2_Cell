@@ -8,7 +8,8 @@ Trace_2 = voltage(:,2);
 
 hold all
 plot(Trace_1,'r');
-plot(Trace_2,'r');
+plot(Trace_2,'b');
+legend('pyramidal','chandelier')
 hold off
 
 figure

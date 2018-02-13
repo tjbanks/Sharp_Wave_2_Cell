@@ -34,13 +34,13 @@ proc PyrToCHN() { local i, j, cellgid, inputid, sourceid, targetid localobj syn,
 	
 	{pc.barrier()}
 
-	for j = 8, 11 {
+	for j = 1, 1 {
 
 		cellgid = j
 
 		if(!pc.gid_exists(cellgid)) { continue }
 
-		for i = 0, 3 {
+		for i = 0, 0 {
 		
 			inputid = i
 			

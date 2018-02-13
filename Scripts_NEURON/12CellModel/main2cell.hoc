@@ -75,7 +75,7 @@ somaVclamp4.amp[0] = -75
 
 objref somaCurrent
 cellslist.object(0) somaCurrent = new IClamp(0.9)
-somaCurrent.dur = 100
+somaCurrent.dur = 300
 somaCurrent.del = 2
 somaCurrent.amp = 1
 
